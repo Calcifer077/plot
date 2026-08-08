@@ -6,16 +6,19 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
 import matplotlib.pyplot as plt
 import numpy as np
+import redis
 
 # non-interactive backend, REQUIRED for servers, avoid GUI/threading issues
 matplotlib.use("Agg")
 
 app = FastAPI()
 
+r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+print(r.ping())
+r.set('foo', 'bar')
 
 class PNGStreamingResponse(StreamingResponse):
     media_type = "image/png"
-
 
 @app.get("/plot", response_class=PNGStreamingResponse)
 async def plot():
@@ -164,3 +167,5 @@ async def health():
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+r.close()
