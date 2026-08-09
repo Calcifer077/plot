@@ -1,0 +1,265 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/inter-tight";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: "Inter Tight Variable", sans-serif;
+  --font-sans: "Inter Variable", sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  /* Extended design tokens (not part of core shadcn set) */
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-surface-tint: var(--surface-tint);
+  --color-inverse-primary: var(--inverse-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  --color-error: var(--error);
+  --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-primary-fixed-dim: var(--primary-fixed-dim);
+  --color-on-primary-fixed: var(--on-primary-fixed);
+  --color-on-primary-fixed-variant: var(--on-primary-fixed-variant);
+  --color-secondary-fixed: var(--secondary-fixed);
+  --color-secondary-fixed-dim: var(--secondary-fixed-dim);
+  --color-on-secondary-fixed: var(--on-secondary-fixed);
+  --color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
+  --color-tertiary-fixed: var(--tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+  --color-on-tertiary-fixed: var(--on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--on-tertiary-fixed-variant);
+  --color-surface-variant: var(--surface-variant);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: #f8f9ff;
+  --foreground: #131c28;
+  --card: #ffffff;
+  --card-foreground: #131c28;
+  --popover: #ffffff;
+  --popover-foreground: #131c28;
+  --primary: #0040cf;
+  --primary-foreground: #ffffff;
+  --secondary: #006a6a;
+  --secondary-foreground: #ffffff;
+  --muted: #e5eeff;
+  --muted-foreground: #434655;
+  --accent: #e0e9f9;
+  --accent-foreground: #0040cf;
+  --destructive: #ba1a1a;
+  --border: #c4c5d8;
+  --input: #c4c5d8;
+  --ring: #0040cf;
+  --chart-1: #0040cf;
+  --chart-2: #006a6a;
+  --chart-3: #8e3300;
+  --chart-4: #2f5bea;
+  --chart-5: #7ef5f4;
+  --radius: 0.625rem;
+  --sidebar: #eff4ff;
+  --sidebar-foreground: #131c28;
+  --sidebar-primary: #0040cf;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e0e9f9;
+  --sidebar-accent-foreground: #0040cf;
+  --sidebar-border: #c4c5d8;
+  --sidebar-ring: #0040cf;
+
+  /* Extended Material-style design tokens */
+  --surface: #f8f9ff;
+  --surface-dim: #d2daeb;
+  --surface-bright: #f8f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --surface-container: #e5eeff;
+  --surface-container-high: #e0e9f9;
+  --surface-container-highest: #dae3f4;
+  --on-surface: #131c28;
+  --on-surface-variant: #434655;
+  --inverse-surface: #28313d;
+  --inverse-on-surface: #eaf1ff;
+  --outline: #747686;
+  --outline-variant: #c4c5d8;
+  --surface-tint: #1f4fdf;
+  --inverse-primary: #b7c4ff;
+  --primary-container: #2f5bea;
+  --on-primary-container: #e5e8ff;
+  --secondary-container: #7ef5f4;
+  --on-secondary-container: #007070;
+  --tertiary: #8e3300;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #b64400;
+  --on-tertiary-container: #ffe4da;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+  --primary-fixed: #dde1ff;
+  --primary-fixed-dim: #b7c4ff;
+  --on-primary-fixed: #001452;
+  --on-primary-fixed-variant: #0038b7;
+  --secondary-fixed: #7ef5f4;
+  --secondary-fixed-dim: #5fd8d8;
+  --on-secondary-fixed: #002020;
+  --on-secondary-fixed-variant: #004f50;
+  --tertiary-fixed: #ffdbcd;
+  --tertiary-fixed-dim: #ffb597;
+  --on-tertiary-fixed: #360f00;
+  --on-tertiary-fixed-variant: #7e2c00;
+  --surface-variant: #dae3f4;
+}
+
+.dark {
+  --background: #0b141f;
+  --foreground: #dae3f4;
+  --card: #131c28;
+  --card-foreground: #dae3f4;
+  --popover: #131c28;
+  --popover-foreground: #dae3f4;
+  --primary: #b7c4ff;
+  --primary-foreground: #002583;
+  --secondary: #5fd8d8;
+  --secondary-foreground: #003737;
+  --muted: #17202c;
+  --muted-foreground: #c4c5d8;
+  --accent: #222b37;
+  --accent-foreground: #b7c4ff;
+  --destructive: #ffb4ab;
+  --border: #434655;
+  --input: #434655;
+  --ring: #b7c4ff;
+  --chart-1: #b7c4ff;
+  --chart-2: #5fd8d8;
+  --chart-3: #ffb597;
+  --chart-4: #2f5bea;
+  --chart-5: #7ef5f4;
+  --sidebar: #131c28;
+  --sidebar-foreground: #dae3f4;
+  --sidebar-primary: #b7c4ff;
+  --sidebar-primary-foreground: #002583;
+  --sidebar-accent: #222b37;
+  --sidebar-accent-foreground: #b7c4ff;
+  --sidebar-border: #434655;
+  --sidebar-ring: #b7c4ff;
+
+  /* Extended Material-style design tokens (dark) */
+  --surface: #0b141f;
+  --surface-dim: #0b141f;
+  --surface-bright: #313a47;
+  --surface-container-lowest: #060f1a;
+  --surface-container-low: #131c28;
+  --surface-container: #17202c;
+  --surface-container-high: #222b37;
+  --surface-container-highest: #2c3542;
+  --on-surface: #dae3f4;
+  --on-surface-variant: #c4c5d8;
+  --inverse-surface: #dae3f4;
+  --inverse-on-surface: #28313d;
+  --outline: #8e90a1;
+  --outline-variant: #434655;
+  --surface-tint: #b7c4ff;
+  --inverse-primary: #1f4fdf;
+  --primary-container: #2f5bea;
+  --on-primary-container: #e5e8ff;
+  --secondary-container: #02a1a1;
+  --on-secondary-container: #002f2f;
+  --tertiary: #ffb597;
+  --on-tertiary: #591d00;
+  --tertiary-container: #b64400;
+  --on-tertiary-container: #ffe4da;
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+  --primary-fixed: #dde1ff;
+  --primary-fixed-dim: #b7c4ff;
+  --on-primary-fixed: #001452;
+  --on-primary-fixed-variant: #0038b7;
+  --secondary-fixed: #7ef5f4;
+  --secondary-fixed-dim: #5fd8d8;
+  --on-secondary-fixed: #002020;
+  --on-secondary-fixed-variant: #004f50;
+  --tertiary-fixed: #ffdbcd;
+  --tertiary-fixed-dim: #ffb597;
+  --on-tertiary-fixed: #360f00;
+  --on-tertiary-fixed-variant: #7e2c00;
+  --surface-variant: #2c3542;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+}
