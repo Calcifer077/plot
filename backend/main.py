@@ -6,19 +6,16 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
 import matplotlib.pyplot as plt
 import numpy as np
-import redis
+import uuid
+
+from config import redis_client
+from responses import PNGStreamingResponse
 
 # non-interactive backend, REQUIRED for servers, avoid GUI/threading issues
 matplotlib.use("Agg")
 
 app = FastAPI()
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
-print(r.ping())
-r.set('foo', 'bar')
-
-class PNGStreamingResponse(StreamingResponse):
-    media_type = "image/png"
 
 @app.get("/plot", response_class=PNGStreamingResponse)
 async def plot():
@@ -122,6 +119,19 @@ async def upload_read_pandas_return_png(
     # }
 
 
+@app.get("/dataset/{redis_key}")
+async def get_dataset(redis_key: str):
+    data_bytes = redis_client.get(redis_key)
+
+    if not data_bytes:
+        raise HTTPException(status_code=404, detail="Dataset not found or expired")
+
+    # Reconstruct the DataFrame from bytes
+    df = pd.read_feather(io.BytesIO(data_bytes))
+
+    return {"num_rows": len(df), "preview": df.head(5).to_dict(orient="records")}
+
+
 @app.post("/upload")
 async def upload_file(
     file: Annotated[UploadFile, File(description="A file read as UploadFile")],
@@ -151,11 +161,25 @@ async def upload_file(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to parse file: {e}")
 
+    # --- REDIS STORAGE BLOCK ---
+    # 1. Serialize DataFrame to Arrow/Feather bytes
+    buffer = io.BytesIO()
+    df.to_feather(buffer)
+    feather_bytes = buffer.getvalue()
+
+    # 2. Generate a unique key for this dataset
+    redis_key = f"dataset:{uuid.uuid4()}"
+
+    # 3. Save to Redis (ex=3600 sets an optional 1-hour expiration time)
+    redis_client.set(redis_key, feather_bytes, ex=3600)
+    # -----------------------
+
+    print(redis_key)
+
     return {
         "filename": file.filename,
         "content_type": file.content_type,
-        "columns": list(df.columns),
-        "num_rows": len(df),
+        "redis_key": redis_key,
     }
 
 
@@ -168,4 +192,5 @@ async def health():
 async def root():
     return {"message": "Hello World"}
 
-r.close()
+
+redis_client.close()
