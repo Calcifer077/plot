@@ -14,8 +14,10 @@ import {
   Search,
   Share2,
   Sun,
+  Moon,
   RefreshCw,
 } from "lucide-react";
+import { useTheme } from "@/lib/hooks/useTheme";
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -32,6 +34,7 @@ const navItems = [
 // eslint-disable-next-line react-refresh/only-export-components
 function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-surface text-on-surface">
@@ -106,8 +109,11 @@ function RootLayout() {
               <Share2 className="h-3.5 w-3.5" />
               Share
             </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-on-surface-variant hover:bg-accent">
-              <Sun className="h-4 w-4" />
+            <button
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-on-surface-variant hover:bg-accent"
+              onClick={toggleTheme}
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             {/* <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-secondary" /> */}
           </div>
