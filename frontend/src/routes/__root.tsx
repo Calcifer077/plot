@@ -28,7 +28,7 @@ const navItems = [
   { to: "/charts", label: "Charts", icon: BarChart3 },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/upload", label: "Upload", icon: Upload },
-  { to: "/export", label: "Exports", icon: Download },
+  { to: "/export", label: "Export", icon: Download },
 ];
 
 // eslint-disable-next-line react-refresh/only-export-components
