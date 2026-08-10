@@ -33,11 +33,12 @@ function ChartTypeButton({
 }: ChartTypeButtonProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={`flex flex-col items-center justify-center gap-1.5 rounded-lg border py-3 text-xs font-medium transition-colors ${
+      className={`flex flex-col items-center justify-center gap-1.5 rounded-lg py-3 text-xs font-medium transition-all ${
         active
-          ? "border-primary border-2 text-primary bg-accent"
-          : "border-border text-foreground hover:bg-accent"
+          ? "ring-2 ring-primary text-primary bg-accent"
+          : "ring-1 ring-muted-foreground/30 text-foreground hover:bg-accent"
       }`}
     >
       {icon}
