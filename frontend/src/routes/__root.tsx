@@ -39,7 +39,7 @@ function RootLayout() {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-surface text-on-surface">
       {/* Sidebar */}
-      <aside className="flex w-[218px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
+      <aside className="flex w-54.5 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
         {/* Project switcher */}
         <div className="flex items-center gap-2.5 px-4 py-4">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
