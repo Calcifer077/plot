@@ -4,18 +4,27 @@ import pandas as pd
 import io
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 import matplotlib.pyplot as plt
 import numpy as np
 import uuid
 
-from config import redis_client
+from config import redis_client, get_settings
 from responses import PNGStreamingResponse
 
 # non-interactive backend, REQUIRED for servers, avoid GUI/threading issues
 matplotlib.use("Agg")
 
 app = FastAPI()
+settings = get_settings()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.frontend_urls_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/plot", response_class=PNGStreamingResponse)
 async def plot():
