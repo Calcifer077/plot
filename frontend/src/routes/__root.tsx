@@ -29,6 +29,7 @@ const navItems = [
   { to: "/export", label: "Exports", icon: Download },
 ];
 
+// eslint-disable-next-line react-refresh/only-export-components
 function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
