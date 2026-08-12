@@ -11,18 +11,13 @@ import redis.asyncio as redis
 
 from config import get_redis_client
 from utils import get_all_keys
+from routers.dataset import service as dataset_service
 
 router = APIRouter(prefix="/dataset", tags=["dataset"])
 
 @router.get('/{redis_key}')
 async def get_dataset(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
-    data_bytes = await redis_client.get(redis_key)
-
-    if not data_bytes:
-        raise HTTPException(status_code=404, detail="Dataset not found or expired")
-
-    # Reconstruct the DataFrame from bytes
-    df = pd.read_feather(io.BytesIO(data_bytes))
+    df = await dataset_service.get_dataframe(redis_key, redis_client)
 
     return {"num_rows": len(df), "preview": df.head(5).to_dict(orient="records")}
 
