@@ -29,7 +29,7 @@ class ChartConfig(BaseModel):
     x_column: str
     y_column: Optional[str] = None
 
-    color: Optional[str] = Field(default="None", description="Hex or named color, e.g. #FF5733 or 'blue'")
+    color: Optional[str] = Field(default=None, description="Hex or named color, e.g. #FF5733 or 'blue'")
 
     title: Optional[str] = None
     x_label: Optional[str] = None
