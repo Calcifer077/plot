@@ -1,16 +1,11 @@
-import redis
+import redis.asyncio as redis
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
-redis_client = redis.Redis(host="localhost", port=6379, decode_responses=False)
+@lru_cache
+def get_redis_client() -> redis.Redis:
+    return redis.Redis(host='localhost', port=6379, decode_responses=False)
 
-# Fail fast if Redis isn't reachable at startup
-try:
-    redis_client.ping()
-    print("Connected to Redis")
-except redis.exceptions.ConnectionError as e:
-    print(f"Could not connect to Redis: {e}")
-    raise
 
 class Settings(BaseSettings):
     """

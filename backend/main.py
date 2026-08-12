@@ -2,15 +2,17 @@ from typing import Annotated
 import matplotlib
 import pandas as pd
 import io
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import matplotlib.pyplot as plt
 import numpy as np
 import uuid
-
-from config import redis_client, get_settings
+import redis.asyncio as redis
 from responses import PNGStreamingResponse
+
+from config import get_redis_client, get_settings
+from utils import get_all_keys
 
 # non-interactive backend, REQUIRED for servers, avoid GUI/threading issues
 matplotlib.use("Agg")
@@ -129,8 +131,8 @@ async def upload_read_pandas_return_png(
 
 
 @app.get("/dataset/{redis_key}")
-async def get_dataset(redis_key: str):
-    data_bytes = redis_client.get(redis_key)
+async def get_dataset(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
+    data_bytes = await redis_client.get(redis_key)
 
     if not data_bytes:
         raise HTTPException(status_code=404, detail="Dataset not found or expired")
@@ -144,9 +146,8 @@ async def get_dataset(redis_key: str):
 @app.post("/upload")
 async def upload_file(
     file: Annotated[UploadFile, File(description="A file read as UploadFile")],
+    redis_client: Annotated[redis.Redis, Depends(get_redis_client)]
 ):
-    print(file.content_type)
-
     if file.content_type not in ["text/csv", "application/json"]:
         raise HTTPException(
             status_code=400,
@@ -180,7 +181,7 @@ async def upload_file(
     redis_key = f"dataset:{uuid.uuid4()}"
 
     # 3. Save to Redis (ex=3600 sets an optional 1-hour expiration time)
-    redis_client.set(redis_key, feather_bytes, ex=3600)
+    await redis_client.set(redis_key, feather_bytes, ex=3600)
     # -----------------------
 
     print(redis_key)
@@ -191,6 +192,12 @@ async def upload_file(
         "redis_key": redis_key,
     }
 
+@app.get('/list-datasets')
+async def list_datasets(
+    redis_client: Annotated[redis.Redis, Depends(get_redis_client)],
+):
+    previews = await get_all_keys(redis_client)
+    return {"datasets": previews}
 
 @app.get("/health")
 async def health():
@@ -201,5 +208,3 @@ async def health():
 async def root():
     return {"message": "Hello World"}
 
-
-redis_client.close()
