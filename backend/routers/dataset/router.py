@@ -8,6 +8,7 @@ import pandas as pd
 import io
 import uuid
 import redis.asyncio as redis
+import numpy as np
 
 from config import get_redis_client
 from utils import get_all_keys
@@ -19,7 +20,9 @@ router = APIRouter(prefix="/dataset", tags=["dataset"])
 async def get_dataset(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
     df = await dataset_service.get_dataframe(redis_key, redis_client)
 
-    return {"num_rows": len(df), "preview": df.head(5).to_dict(orient="records")}
+    preview_df = df.head(5).replace({np.nan: None})
+
+    return {"num_rows": len(df), "preview": preview_df.to_dict(orient="records")}
 
 @router.post('/upload')
 async def upload_file(
