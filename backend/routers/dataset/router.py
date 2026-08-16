@@ -77,3 +77,10 @@ async def upload_file(
 async def list_datasets(redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
     previews = await get_all_keys(redis_client)
     return {"datasets": previews}
+
+@router.delete('/{redis_key}')
+async def delete_dataset(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
+    deleted_count = await redis_client.delete(redis_key)
+    if deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    return {"message": f"Dataset with key {redis_key} deleted successfully."}
