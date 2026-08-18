@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import Charts from "@/components/app/charts/Charts";
+import Charts from "@/features/charts/Charts";
 
 export const Route = createFileRoute("/charts")({
   component: Charts,
