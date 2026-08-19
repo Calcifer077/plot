@@ -2,7 +2,7 @@
 This file is responsible for routing the requests to the appropriate endpoints for datasets.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from typing import Annotated
 import pandas as pd
 import io
@@ -16,13 +16,11 @@ from routers.dataset import service as dataset_service
 
 router = APIRouter(prefix="/dataset", tags=["dataset"])
 
-@router.get('/{redis_key}')
-async def get_dataset(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
-    df = await dataset_service.get_dataframe(redis_key, redis_client)
-
-    preview_df = df.head(5).replace({np.nan: None})
-
-    return {"num_rows": len(df), "preview": preview_df.to_dict(orient="records")}
+@router.get('/list')
+async def list_datasets(redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
+    print('hello');
+    previews = await get_all_keys(redis_client)
+    return {"datasets": previews}
 
 @router.post('/upload')
 async def upload_file(
@@ -73,14 +71,106 @@ async def upload_file(
         "redis_key": redis_key,
     }
 
-@router.get('/list')
-async def list_datasets(redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
-    previews = await get_all_keys(redis_client)
-    return {"datasets": previews}
-
 @router.delete('/{redis_key}')
 async def delete_dataset(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
     deleted_count = await redis_client.delete(redis_key)
     if deleted_count == 0:
         raise HTTPException(status_code=404, detail="Dataset not found")
     return {"message": f"Dataset with key {redis_key} deleted successfully."}
+
+@router.get('/metadata/{redis_key}')
+async def get_metadata_for_dataset(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
+    try:
+        df = await dataset_service.get_dataframe(redis_key, redis_client)
+
+        total_rows = int(len(df))
+        total_columns = int(len(df.columns))
+        
+        # 'isnull() returns true for missing values
+        # first '.sum()' sums true column by column and produces a series
+        # second '.sum()' sums that series
+        missing_values= int(df.isnull().sum().sum())
+        numeric_cols = int(len(df.select_dtypes(include='number').columns))
+        categorical_cols = total_columns - numeric_cols
+
+        return {
+            "total_rows": total_rows,
+            "total_columns": total_columns,
+            "missing_values": missing_values,
+            "numeric_cols": numeric_cols,
+            "categorical_cols": categorical_cols
+        }
+    
+    except ValueError as e: 
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get('/values/{redis_key}')
+async def get_values_for_dataset(
+    redis_key: str,
+    redis_client: Annotated[redis.Redis, Depends(get_redis_client)],
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100)
+):
+    try:
+        df = await dataset_service.get_dataframe(redis_key, redis_client)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+    total_rows = len(df)
+    if total_rows == 0:
+        return {
+            "page": page,
+            "per_page": per_page,
+            "total_rows": 0,
+            "total_pages": 0,
+            "data": []
+        }
+
+    offset = (page - 1) * per_page
+    if offset >= total_rows:
+        return {
+            "page": page,
+            "per_page": per_page,
+            "total_rows": total_rows,
+            "total_pages": (total_rows + per_page - 1) // per_page,
+            "data": []
+        }
+
+    values_to_return = df.iloc[offset:offset + per_page]
+
+    return {
+        "page": page,
+        "per_page": per_page,
+        "total_rows": total_rows,
+        "total_pages": (total_rows + per_page - 1) // per_page,
+        "data": values_to_return.to_dict(orient="records")
+    }
+
+@router.get('/{redis_key}')
+async def get_dataset(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
+    try:
+
+        df = await dataset_service.get_dataframe(redis_key, redis_client)
+
+        preview_df = df.head(10).replace({np.nan: None})
+
+        # total rows, columns, missing values, numeric cols, categorical
+        # first 10 rows
+        total_rows = int(len(df))
+        total_columns = int(len(df.columns))
+
+        # 'isnull) returns true for missing values
+        # first '.sum()' sums true column by column and produces a series
+        # second '.sum()' sums that series
+        missing_values= int(df.isnull().sum().sum())
+        numeric_cols = int(len(df.select_dtypes(include='number').columns))
+        categorical_cols = total_columns - numeric_cols
+
+        return {"total_rows": total_rows, "total_columns": total_columns, "missing_values": missing_values, "numeric_cols": numeric_cols, "categorical_cols": categorical_cols, "preview": preview_df.to_dict(orient="records")}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
