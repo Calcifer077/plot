@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   UploadCloud,
   FileSpreadsheet,
@@ -10,9 +10,93 @@ import {
   Braces,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatSize, getExtension } from "@/lib/utils";
+
+type FileStatus = "waiting" | "uploading" | "complete" | "error";
+
+interface UploadFile {
+  id: number;
+  file: File;
+  name: string;
+  size: number;
+  title: string;
+  status: FileStatus;
+  error?: string;
+}
+
+const MAX_SIZE_MB: number = 50;
+const ALLOWED_EXTENSIONS = ["json", "csv"];
 
 export default function Upload() {
   const [dismissed, setDismissed] = useState(false);
+  const [file, setFile] = useState<UploadFile | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // file info (will only be used when file is present)
+  const [fileName, setFileName] = useState<string>("");
+  const [fileSize, setFileSize] = useState<string>("");
+
+  function fileToUploadFile(file: File): UploadFile | null {
+    const sizeOfFile = formatSize(file.size);
+    const fileExtension = getExtension(file.name);
+
+    setFileName(file.name);
+    setFileSize(sizeOfFile);
+
+    if (Number(sizeOfFile.split(" ")[0]) > MAX_SIZE_MB) return null;
+
+    if (!ALLOWED_EXTENSIONS.includes(getExtension(file.name))) return null;
+
+    return {
+      id: Date.now(),
+      file,
+      name: file.name,
+      size: file.size,
+      title: file.name,
+      status: "waiting",
+    };
+  }
+
+  function setSingleFile(newFile: File | null) {
+    if (newFile) {
+      setFile(fileToUploadFile(newFile));
+    } else {
+      setFile(null);
+    }
+  }
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(false);
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files.length > 0) {
+      setSingleFile(e.dataTransfer.files[0]);
+    }
+  }
+
+  function handleFileInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files.length > 0) {
+      setSingleFile(e.target.files[0]);
+    }
+
+    e.target.value = "";
+  }
+
+  function clearFile() {
+    setSingleFile(null);
+  }
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
@@ -23,13 +107,24 @@ export default function Upload() {
       </nav>
 
       {/* Dropzone */}
-      <div className="flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed border-outline-variant bg-surface-container-lowest px-8 py-12 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent">
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`flex flex-col items-center gap-4 rounded-2xl border-2 px-8 py-12 text-center transition-colors
+    ${
+      isDragging
+        ? "bg-primary-container/10 border-solid border-primary"
+        : "bg-surface-container-lowest border-dashed border-outline-variant hover:border-outline"
+    }
+    `}
+      >
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-container/15">
           <UploadCloud className="h-6 w-6 text-primary" strokeWidth={2} />
         </div>
 
         <div>
-          <p className="font-semibold text-foreground">
+          <p className="font-heading font-semibold text-on-surface">
             Drag &amp; drop your file here
           </p>
           <p className="mt-1 text-sm text-on-surface-variant">
@@ -38,39 +133,48 @@ export default function Upload() {
         </div>
 
         <div className="flex w-full max-w-xs items-center gap-3">
-          <div className="h-px flex-1 bg-border" />
+          <div className="h-px flex-1 bg-outline-variant" />
           <span className="text-xs uppercase tracking-wide text-on-surface-variant">
             or
           </span>
-          <div className="h-px flex-1 bg-border" />
+          <div className="h-px flex-1 bg-outline-variant" />
         </div>
 
         <Button
-          className="rounded-lg border-2 border-primary px-5 py-2 text-sm font-semibold text-primary hover:bg-accent"
+          className="rounded-lg border-2 border-primary px-5 py-2 text-sm font-semibold text-primary hover:bg-primary-container/10"
           variant="outline"
           size="lg"
+          onClick={() => inputRef.current?.click()}
         >
           Browse Files
         </Button>
 
+        <input
+          ref={inputRef}
+          id="file-upload-input"
+          type="file"
+          accept=".json,.csv"
+          className="hidden"
+          onChange={handleFileInputChange}
+        />
+
         <div className="mt-1 flex items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
+          <span className="flex items-center gap-1.5 rounded-full bg-secondary-container/40 px-3 py-1 text-xs font-medium text-on-secondary-container">
             <FileText className="h-3.5 w-3.5" />
             .xlsx
           </span>
-          <span className="flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
+          <span className="flex items-center gap-1.5 rounded-full bg-secondary-container/40 px-3 py-1 text-xs font-medium text-on-secondary-container">
             <Sheet className="h-3.5 w-3.5" />
             .csv
           </span>
-          <span className="flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
+          <span className="flex items-center gap-1.5 rounded-full bg-secondary-container/40 px-3 py-1 text-xs font-medium text-on-secondary-container">
             <Braces className="h-3.5 w-3.5" />
             .json
           </span>
         </div>
       </div>
 
-      {/* Active upload card */}
-      {!dismissed && (
+      {file && (
         <div className="rounded-2xl border border-border bg-surface-container-lowest p-5">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary-container">
@@ -81,11 +185,9 @@ export default function Upload() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-foreground">
-                orders_2026.xlsx
+                {fileName}
               </p>
-              <p className="text-xs text-on-surface-variant">
-                4.4 MB · Preparing analysis
-              </p>
+              <p className="text-xs text-on-surface-variant">{fileSize}</p>
             </div>
             <Button
               onClick={() => setDismissed(true)}
