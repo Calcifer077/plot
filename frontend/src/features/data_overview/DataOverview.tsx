@@ -3,12 +3,14 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
-  AlertTriangle,
-  CheckCircle2,
-  Square,
-  Zap,
-  CircleDot,
+  // AlertTriangle,
+  // CheckCircle2,
+  // Square,
+  // Zap,
+  // CircleDot,
 } from "lucide-react";
+
+import TableComponent from "@/components/app/data_overview/TableComponent";
 
 interface StatCardProps {
   label: string;
@@ -69,36 +71,36 @@ interface IssueRowProps {
   action?: React.ReactNode;
 }
 
-function IssueRow({
-  icon,
-  iconBg,
-  iconColor,
-  title,
-  sub,
-  action,
-}: IssueRowProps) {
-  return (
-    <div className="flex gap-2.5 mb-3.5">
-      <div
-        className="w-6.5 h-6.5 min-w-6.5 rounded-md flex items-center justify-center"
-        style={{ background: iconBg, color: iconColor }}
-      >
-        {icon}
-      </div>
-      <div>
-        <div className="text-sm font-semibold text-card-foreground">
-          {title}
-        </div>
-        <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>
-        {action && (
-          <div className="text-xs font-semibold text-primary mt-1 cursor-pointer flex items-center gap-1">
-            {action}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+// function IssueRow({
+//   icon,
+//   iconBg,
+//   iconColor,
+//   title,
+//   sub,
+//   action,
+// }: IssueRowProps) {
+//   return (
+//     <div className="flex gap-2.5 mb-3.5">
+//       <div
+//         className="w-6.5 h-6.5 min-w-6.5 rounded-md flex items-center justify-center"
+//         style={{ background: iconBg, color: iconColor }}
+//       >
+//         {icon}
+//       </div>
+//       <div>
+//         <div className="text-sm font-semibold text-card-foreground">
+//           {title}
+//         </div>
+//         <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>
+//         {action && (
+//           <div className="text-xs font-semibold text-primary mt-1 cursor-pointer flex items-center gap-1">
+//             {action}
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
 
 const orders = [
   {
@@ -152,6 +154,7 @@ const orders = [
 ];
 
 export default function DataOverview() {
+  console.log(Object.values(orders[0]));
   return (
     <div className="min-h-screen bg-background p-6 font-sans text-foreground">
       <div className="max-w-6xl mx-auto">
@@ -218,7 +221,7 @@ export default function DataOverview() {
         </div>
 
         {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-4">
+        <div className="">
           {/* Data preview */}
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-center justify-between mb-2.5">
@@ -231,44 +234,16 @@ export default function DataOverview() {
                 </div>
               </div>
             </div>
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr>
-                  {["#", "Order date", "Customer", "Revenue", "Qty"].map(
-                    (h) => (
-                      <th
-                        key={h}
-                        className="text-left text-[11px] font-medium uppercase text-muted-foreground border-b border-border py-1.5 px-1"
-                      >
-                        {h}
-                      </th>
-                    ),
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((o) => (
-                  <tr key={o.id} className="border-b border-border/50">
-                    <td className="py-2 px-1 text-primary">{o.id}</td>
-                    <td className="py-2 px-1">{o.date}</td>
-                    <td className="py-2 px-1">{o.customer}</td>
-                    <td
-                      className={`py-2 px-1 ${o.highlight ? "text-[#8e3300] font-medium" : ""}`}
-                    >
-                      {o.revenue}
-                    </td>
-                    <td className="py-2 px-1">{o.qty}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+            <TableComponent data={orders} />
+
             <div className="text-center text-sm text-primary pt-3 cursor-pointer hover:underline">
               View all 12,480 rows
             </div>
           </div>
 
           {/* Dataset health */}
-          <div className="bg-card border border-border rounded-xl p-4">
+          {/* <div className="bg-card border border-border rounded-xl p-4">
             <div className="text-sm font-semibold mb-2.5">Dataset health</div>
 
             <div className="flex flex-col items-center py-2.5">
@@ -327,7 +302,7 @@ export default function DataOverview() {
                 </>
               }
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
