@@ -17,6 +17,7 @@ import {
   Moon,
   RefreshCw,
 } from "lucide-react";
+import { Toaster } from "@/components/ui/sonner";
 import { useTheme } from "@/lib/hooks/useTheme";
 
 export const Route = createRootRoute({
@@ -122,6 +123,7 @@ function RootLayout() {
         {/* Routed page content */}
         <main className="flex-1 overflow-y-auto bg-surface p-6">
           <Outlet />
+          <Toaster />
         </main>
       </div>
     </div>
