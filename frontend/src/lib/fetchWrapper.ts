@@ -5,22 +5,25 @@ interface ClientConfig extends Omit<RequestInit, "body" | "headers"> {
   headers?: HeadersInit;
 }
 
-export default function client<TResponse = unknown>(
+export default function fetchWrapper<TResponse = unknown>(
   endpoint: string,
   { body, ...customConfig }: ClientConfig = {},
 ): Promise<TResponse> {
-  const headers = { "Content-Type": "application/json" };
+  const isFormData = body instanceof FormData;
+
   const config: RequestInit = {
     method: body ? "POST" : "GET",
     ...customConfig,
     headers: {
-      ...headers,
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...customConfig.headers,
     },
   };
+
   if (body) {
-    config.body = JSON.stringify(body);
+    config.body = isFormData ? body : JSON.stringify(body);
   }
+
   return window
     .fetch(`${backendUrl}/${endpoint}`, config)
     .then(async (response) => {
