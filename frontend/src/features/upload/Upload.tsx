@@ -10,7 +10,10 @@ import {
   Braces,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { formatSize, getExtension } from "@/lib/utils";
+import { toast } from "sonner";
+import fetchWrapper from "@/lib/fetchWrapper";
 
 type FileStatus = "waiting" | "uploading" | "complete" | "error";
 
@@ -28,7 +31,7 @@ const MAX_SIZE_MB: number = 50;
 const ALLOWED_EXTENSIONS = ["json", "csv"];
 
 export default function Upload() {
-  const [dismissed, setDismissed] = useState(false);
+  // const [dismissed, setDismissed] = useState(false);
   const [file, setFile] = useState<UploadFile | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,9 +48,15 @@ export default function Upload() {
     setFileName(file.name);
     setFileSize(sizeOfFile);
 
-    if (Number(sizeOfFile.split(" ")[0]) > MAX_SIZE_MB) return null;
+    if (Number(sizeOfFile.split(" ")[0]) > MAX_SIZE_MB) {
+      toast.error(`File size should be less than ${MAX_SIZE_MB} MB`);
+      return null;
+    }
 
-    if (!ALLOWED_EXTENSIONS.includes(getExtension(file.name))) return null;
+    if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+      toast.error(`Only ${ALLOWED_EXTENSIONS.join(", ")} are allowed`);
+      return null;
+    }
 
     return {
       id: Date.now(),
@@ -96,6 +105,27 @@ export default function Upload() {
 
   function clearFile() {
     setSingleFile(null);
+  }
+
+  async function handleUpload(file: UploadFile) {
+    setIsSubmitting(true);
+    const formData = new FormData();
+    formData.append("file", file.file);
+
+    try {
+      await fetchWrapper<{
+        fileName: string;
+        content_type: string;
+        redis_key: string;
+      }>("dataset/upload", { body: formData });
+
+      toast.success("file uploaded successfully.");
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong while uploading file.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -159,15 +189,15 @@ export default function Upload() {
         />
 
         <div className="mt-1 flex items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded-full bg-secondary-container/40 px-3 py-1 text-xs font-medium text-on-secondary-container">
+          <span className="flex items-center gap-1.5 rounded-full bg-primary-container/90 px-3 py-1 text-xs font-medium text-on-primary-container">
             <FileText className="h-3.5 w-3.5" />
             .xlsx
           </span>
-          <span className="flex items-center gap-1.5 rounded-full bg-secondary-container/40 px-3 py-1 text-xs font-medium text-on-secondary-container">
+          <span className="flex items-center gap-1.5 rounded-full bg-primary-container/90 px-3 py-1 text-xs font-medium text-on-primary-container">
             <Sheet className="h-3.5 w-3.5" />
             .csv
           </span>
-          <span className="flex items-center gap-1.5 rounded-full bg-secondary-container/40 px-3 py-1 text-xs font-medium text-on-secondary-container">
+          <span className="flex items-center gap-1.5 rounded-full bg-primary-container/90 px-3 py-1 text-xs font-medium text-on-primary-container">
             <Braces className="h-3.5 w-3.5" />
             .json
           </span>
@@ -176,6 +206,7 @@ export default function Upload() {
 
       {file && (
         <div className="rounded-2xl border border-border bg-surface-container-lowest p-5">
+          {/* File identity row */}
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary-container">
               <FileSpreadsheet
@@ -190,7 +221,7 @@ export default function Upload() {
               <p className="text-xs text-on-surface-variant">{fileSize}</p>
             </div>
             <Button
-              onClick={() => setDismissed(true)}
+              onClick={clearFile}
               className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-accent"
               aria-label="Dismiss upload"
               variant="ghost"
@@ -199,7 +230,23 @@ export default function Upload() {
             </Button>
           </div>
 
-          <div className="mt-4 flex items-center justify-between text-xs">
+          <div className="mt-4 flex items-center justify-end gap-2 border-t border-border pt-4">
+            <Button variant="ghost" onClick={clearFile} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button
+              disabled={isSubmitting}
+              onClick={() => {
+                handleUpload(file);
+              }}
+            >
+              {isSubmitting && <Spinner data-icon="inline-start" />}
+              Upload
+            </Button>
+          </div>
+
+          {/* Progress state — swap the footer above for this once upload starts */}
+          {/* <div className="mt-4 flex items-center justify-between text-xs">
             <span className="font-semibold text-primary">65% Processed</span>
             <span className="text-on-surface-variant">
               Approx. 12s remaining
@@ -208,12 +255,12 @@ export default function Upload() {
           <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div className="h-full w-[65%] rounded-full bg-primary transition-all" />
           </div>
-
+ 
           <div className="mt-5 grid grid-cols-3 gap-3">
             <StepStatus label="Uploaded" state="done" />
             <StepStatus label="Parsing sheets" state="done" />
             <StepStatus label="Profiling columns" state="pending" />
-          </div>
+          </div> */}
         </div>
       )}
     </div>
