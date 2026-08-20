@@ -78,6 +78,16 @@ async def delete_dataset(redis_key: str, redis_client: Annotated[redis.Redis, De
         raise HTTPException(status_code=404, detail="Dataset not found")
     return {"message": f"Dataset with key {redis_key} deleted successfully."}
 
+@router.get('/check-if-dataset-exists/{redis_key}')
+async def check_if_dataset_exists(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]) -> bool:
+    res = await dataset_service.check_if_dataframe_exists(redis_key, redis_client)
+
+    if res: 
+        return True
+    else: 
+        return False
+    
+
 @router.get('/metadata/{redis_key}')
 async def get_metadata_for_dataset(redis_key: str, redis_client: Annotated[redis.Redis, Depends(get_redis_client)]):
     try:
@@ -141,7 +151,7 @@ async def get_values_for_dataset(
             "data": []
         }
 
-    values_to_return = df.iloc[offset:offset + per_page]
+    values_to_return = df.iloc[offset:offset + per_page].replace({np.nan: None})
 
     return {
         "page": page,
