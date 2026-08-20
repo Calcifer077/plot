@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-type RowData = Record<string, unknown>;
+type RowData = Record<string, string | number | boolean | null>;
 
 interface TableComponentProps<T extends RowData> {
   data: T[];
