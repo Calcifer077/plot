@@ -11,11 +11,13 @@ import {
 } from "lucide-react";
 
 import TableComponent from "@/components/app/data_overview/TableComponent";
+import { Route } from "@/routes/data-overview/$datasetId";
+import { Button } from "@/components/ui/button";
 
 interface StatCardProps {
   label: string;
   labelColor: string;
-  value: string;
+  value: string | number;
   warning?: boolean;
   barColor?: string;
   barWidth?: string;
@@ -154,7 +156,28 @@ const orders = [
 ];
 
 export default function DataOverview() {
-  console.log(Object.values(orders[0]));
+  const { datasetId } = Route.useParams();
+  const { page } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  const { metadata, values } = Route.useLoaderData();
+
+  function goToPage(newPage: number) {
+    navigate({ search: (prev) => ({ ...prev, page: newPage }) });
+  }
+
+  function handleNextPage() {
+    if (page < values.total_pages) {
+      goToPage(page + 1);
+    }
+  }
+
+  function handlePrevPage() {
+    if (page > 1) {
+      goToPage(page - 1);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background p-6 font-sans text-foreground">
       <div className="max-w-6xl mx-auto">
@@ -186,35 +209,35 @@ export default function DataOverview() {
           <StatCard
             label="Total rows"
             labelColor="text-primary"
-            value="12,480"
+            value={metadata.total_rows}
             barColor="bg-primary"
             barWidth="60%"
           />
           <StatCard
             label="Columns"
             labelColor="text-primary"
-            value="18"
+            value={metadata.total_columns}
             barColor="bg-primary"
             barWidth="80%"
           />
           <StatCard
             label="Missing values"
             labelColor="text-[#993C1D]"
-            value="326"
+            value={metadata.missing_values}
             warning
             missing
           />
           <StatCard
             label="Numeric cols"
             labelColor="text-secondary"
-            value="9"
+            value={metadata.numeric_cols}
             barColor="bg-[#639922]"
             barWidth="60%"
           />
           <StatCard
             label="Categorical"
             labelColor="text-[#993C1D]"
-            value="6"
+            value={metadata.categorical_cols}
             barColor="bg-[#BA7517]"
             barWidth="40%"
           />
@@ -227,18 +250,32 @@ export default function DataOverview() {
             <div className="flex items-center justify-between mb-2.5">
               <div className="text-sm font-semibold">Data preview</div>
               <div className="text-xs text-muted-foreground flex items-center gap-2">
-                Showing 1-10 of 12,480
+                Showing 1-10 of {metadata.total_rows}
                 <div className="flex gap-1">
-                  <ChevronLeft className="w-4 h-4 cursor-pointer" />
-                  <ChevronRight className="w-4 h-4 cursor-pointer" />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handlePrevPage}
+                    className="size-8 rounded-md border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleNextPage}
+                    className="size-8 rounded-md border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-40"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             </div>
 
-            <TableComponent data={orders} />
+            <TableComponent data={values.data} />
 
             <div className="text-center text-sm text-primary pt-3 cursor-pointer hover:underline">
-              View all 12,480 rows
+              View all {metadata.total_rows} rows
             </div>
           </div>
 
