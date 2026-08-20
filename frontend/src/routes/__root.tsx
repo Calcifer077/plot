@@ -25,7 +25,7 @@ export const Route = createRootRoute({
 });
 
 const navItems = [
-  { to: "/data-overview", label: "Data Overview", icon: Database },
+  { to: "/data-overview/$datasetId", label: "Data Overview", icon: Database },
   { to: "/charts", label: "Charts", icon: BarChart3 },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/upload", label: "Upload", icon: Upload },
