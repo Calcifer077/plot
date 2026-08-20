@@ -14,6 +14,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { formatSize, getExtension } from "@/lib/utils";
 import { toast } from "sonner";
 import fetchWrapper from "@/lib/fetchWrapper";
+import { useNavigate } from "@tanstack/react-router";
 
 type FileStatus = "waiting" | "uploading" | "complete" | "error";
 
@@ -40,6 +41,8 @@ export default function Upload() {
   // file info (will only be used when file is present)
   const [fileName, setFileName] = useState<string>("");
   const [fileSize, setFileSize] = useState<string>("");
+
+  const navigate = useNavigate();
 
   function fileToUploadFile(file: File): UploadFile | null {
     const sizeOfFile = formatSize(file.size);
@@ -113,13 +116,19 @@ export default function Upload() {
     formData.append("file", file.file);
 
     try {
-      await fetchWrapper<{
+      const result = await fetchWrapper<{
         fileName: string;
         content_type: string;
         redis_key: string;
       }>("dataset/upload", { body: formData });
 
       toast.success("file uploaded successfully.");
+
+      navigate({
+        to: "/data-overview/$datasetId",
+        params: { datasetId: result.redis_key },
+        search: { page: 1 },
+      });
     } catch (err) {
       console.log(err);
       toast.error("Something went wrong while uploading file.");
