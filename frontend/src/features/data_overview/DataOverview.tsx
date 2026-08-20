@@ -13,15 +13,18 @@ import {
 import TableComponent from "@/components/app/data_overview/TableComponent";
 import { Route } from "@/routes/data-overview/$datasetId";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { getDataOverviewPageMetadata } from "@/lib/data";
 
 interface StatCardProps {
   label: string;
   labelColor: string;
-  value: string | number;
+  value: string | number | undefined;
   warning?: boolean;
   barColor?: string;
   barWidth?: string;
   missing?: boolean;
+  loading?: boolean;
 }
 
 function StatCard({
@@ -32,6 +35,7 @@ function StatCard({
   barColor,
   barWidth,
   missing,
+  loading,
 }: StatCardProps) {
   return (
     <div className="bg-card border border-border rounded-xl p-4">
@@ -40,11 +44,19 @@ function StatCard({
       >
         {label}
       </div>
-      <div className="text-2xl font-bold mt-1 text-card-foreground flex items-center gap-1">
-        {value}
-        {warning && <span className="text-sm">⚠️</span>}
-      </div>
-      {missing ? (
+
+      {loading ? (
+        <div className="h-7 w-16 mt-1 rounded-md bg-muted animate-pulse" />
+      ) : (
+        <div className="text-2xl font-bold mt-1 text-card-foreground flex items-center gap-1">
+          {value}
+          {warning && <span className="text-sm">⚠️</span>}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="h-1 w-full rounded-full mt-2.5 bg-muted animate-pulse" />
+      ) : missing ? (
         <div className="flex gap-1 mt-2.5 h-3.5 items-end">
           {[6, 10, 5, 4, 12].map((h, i) => (
             <div
@@ -64,14 +76,14 @@ function StatCard({
   );
 }
 
-interface IssueRowProps {
-  icon: React.ReactNode;
-  iconBg: string;
-  iconColor: string;
-  title: string;
-  sub: string;
-  action?: React.ReactNode;
-}
+// interface IssueRowProps {
+//   icon: React.ReactNode;
+//   iconBg: string;
+//   iconColor: string;
+//   title: string;
+//   sub: string;
+//   action?: React.ReactNode;
+// }
 
 // function IssueRow({
 //   icon,
@@ -104,63 +116,68 @@ interface IssueRowProps {
 //   );
 // }
 
-const orders = [
-  {
-    id: "#ORD-00124",
-    date: "2026-01-15",
-    customer: "Acme Corp",
-    revenue: "$12,400.00",
-    qty: 42,
-    highlight: false,
-  },
-  {
-    id: "#ORD-00125",
-    date: "2026-01-16",
-    customer: "Globex Ltd",
-    revenue: "$9,250.00",
-    qty: 15,
-    highlight: true,
-  },
-  {
-    id: "#ORD-00126",
-    date: "2026-01-16",
-    customer: "Soylent Corp",
-    revenue: "$1,420.00",
-    qty: 3,
-    highlight: false,
-  },
-  {
-    id: "#ORD-00127",
-    date: "2026-01-17",
-    customer: "Initech LLC",
-    revenue: "$18,900.00",
-    qty: 112,
-    highlight: false,
-  },
-  {
-    id: "#ORD-00128",
-    date: "2026-01-18",
-    customer: "Umbrella Inc",
-    revenue: "$5,400.50",
-    qty: 28,
-    highlight: false,
-  },
-  {
-    id: "#ORD-00129",
-    date: "2026-01-18",
-    customer: "Hooli",
-    revenue: "$22,000.00",
-    qty: 89,
-    highlight: true,
-  },
-];
+// const orders = [
+//   {
+//     id: "#ORD-00124",
+//     date: "2026-01-15",
+//     customer: "Acme Corp",
+//     revenue: "$12,400.00",
+//     qty: 42,
+//     highlight: false,
+//   },
+//   {
+//     id: "#ORD-00125",
+//     date: "2026-01-16",
+//     customer: "Globex Ltd",
+//     revenue: "$9,250.00",
+//     qty: 15,
+//     highlight: true,
+//   },
+//   {
+//     id: "#ORD-00126",
+//     date: "2026-01-16",
+//     customer: "Soylent Corp",
+//     revenue: "$1,420.00",
+//     qty: 3,
+//     highlight: false,
+//   },
+//   {
+//     id: "#ORD-00127",
+//     date: "2026-01-17",
+//     customer: "Initech LLC",
+//     revenue: "$18,900.00",
+//     qty: 112,
+//     highlight: false,
+//   },
+//   {
+//     id: "#ORD-00128",
+//     date: "2026-01-18",
+//     customer: "Umbrella Inc",
+//     revenue: "$5,400.50",
+//     qty: 28,
+//     highlight: false,
+//   },
+//   {
+//     id: "#ORD-00129",
+//     date: "2026-01-18",
+//     customer: "Hooli",
+//     revenue: "$22,000.00",
+//     qty: 89,
+//     highlight: true,
+//   },
+// ];
 
 export default function DataOverview() {
   const { datasetId } = Route.useParams();
   const { page } = Route.useSearch();
   const navigate = Route.useNavigate();
 
-  const { metadata, values } = Route.useLoaderData();
+  const { data: metadata, isLoading: isLoadingMetadata } = useQuery({
+    queryKey: ["dataoverview-metadata", datasetId],
+    queryFn: () => getDataOverviewPageMetadata(datasetId),
+  });
+
+  const { values } = Route.useLoaderData();
 
   function goToPage(newPage: number) {
     navigate({ search: (prev) => ({ ...prev, page: newPage }) });
@@ -209,37 +226,42 @@ export default function DataOverview() {
           <StatCard
             label="Total rows"
             labelColor="text-primary"
-            value={metadata.total_rows}
+            value={metadata?.total_rows}
             barColor="bg-primary"
             barWidth="60%"
+            loading={isLoadingMetadata}
           />
           <StatCard
             label="Columns"
             labelColor="text-primary"
-            value={metadata.total_columns}
+            value={metadata?.total_columns}
             barColor="bg-primary"
             barWidth="80%"
+            loading={isLoadingMetadata}
           />
           <StatCard
             label="Missing values"
             labelColor="text-[#993C1D]"
-            value={metadata.missing_values}
+            value={metadata?.missing_values}
             warning
             missing
+            loading={isLoadingMetadata}
           />
           <StatCard
             label="Numeric cols"
             labelColor="text-secondary"
-            value={metadata.numeric_cols}
+            value={metadata?.numeric_cols}
             barColor="bg-[#639922]"
             barWidth="60%"
+            loading={isLoadingMetadata}
           />
           <StatCard
             label="Categorical"
             labelColor="text-[#993C1D]"
-            value={metadata.categorical_cols}
+            value={metadata?.categorical_cols}
             barColor="bg-[#BA7517]"
             barWidth="40%"
+            loading={isLoadingMetadata}
           />
         </div>
 
@@ -250,7 +272,7 @@ export default function DataOverview() {
             <div className="flex items-center justify-between mb-2.5">
               <div className="text-sm font-semibold">Data preview</div>
               <div className="text-xs text-muted-foreground flex items-center gap-2">
-                Showing 1-10 of {metadata.total_rows}
+                Showing 1-10 of {metadata?.total_rows}
                 <div className="flex gap-1">
                   <Button
                     variant="outline"
@@ -275,7 +297,7 @@ export default function DataOverview() {
             <TableComponent data={values.data} />
 
             <div className="text-center text-sm text-primary pt-3 cursor-pointer hover:underline">
-              View all {metadata.total_rows} rows
+              View all {metadata?.total_rows} rows
             </div>
           </div>
 

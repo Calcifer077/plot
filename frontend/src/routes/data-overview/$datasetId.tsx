@@ -5,14 +5,6 @@ import DataOverview from "@/features/data_overview/DataOverview";
 import { EmptyDemo } from "@/components/app/ui/EmptyState";
 import fetchWrapper from "@/lib/fetchWrapper";
 
-type DataOverviewMetadata = {
-  total_rows: number;
-  total_columns: number;
-  missing_values: number;
-  numeric_cols: number;
-  categorical_cols: number;
-};
-
 type DataOverViewValuesRow = Record<string, string | number | boolean | null>;
 
 type DataOverviewValues = {
@@ -41,15 +33,11 @@ export const Route = createFileRoute("/data-overview/$datasetId")({
       throw notFound();
     }
 
-    const metadata = await fetchWrapper<DataOverviewMetadata>(
-      `dataset/metadata/${params.datasetId}`,
-    );
-
     const values = await fetchWrapper<DataOverviewValues>(
       `dataset/values/${params.datasetId}?page=${deps.page}`,
     );
 
-    return { metadata, values };
+    return { values };
   },
   notFoundComponent: EmptyDemo,
   component: DataOverview,
