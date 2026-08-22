@@ -32,26 +32,22 @@ const navItems = [
     to: "/data-overview/$datasetId",
     label: "Data Overview",
     icon: Database,
-    needDatasetId: true,
   },
   {
     to: "/charts/$datasetId",
     label: "Charts",
     icon: BarChart3,
-    needDatasetId: false,
   },
   {
     to: "/dashboard/$datasetId",
     label: "Dashboard",
     icon: LayoutDashboard,
-    needDatasetId: true,
   },
-  { to: "/upload", label: "Upload", icon: Upload, needDatasetId: true },
+  { to: "/upload", label: "Upload", icon: Upload },
   {
     to: "/export/$datasetId",
     label: "Export",
     icon: Download,
-    needDatasetId: true,
   },
 ];
 
@@ -61,7 +57,10 @@ const queryClient = new QueryClient();
 function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { theme, toggleTheme } = useTheme();
-  const [datasetId, setDatasetId] = useLocalStorage("datasetId", "");
+  const [datasetId, setDatasetId] = useLocalStorage(
+    "datasetId",
+    "no-dataset-id",
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -83,8 +82,9 @@ function RootLayout() {
 
           {/* Nav */}
           <nav className="flex flex-1 flex-col gap-1 px-3 pt-2">
-            {navItems.map(({ to, label, icon: Icon, needDatasetId }) => {
+            {navItems.map(({ to, label, icon: Icon }) => {
               const active = pathname.startsWith(to);
+              const needDatasetId = to.includes("$datasetId");
 
               if (needDatasetId) {
                 return (

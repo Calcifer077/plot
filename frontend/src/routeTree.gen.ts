@@ -27,14 +27,14 @@ const UploadRoute = UploadRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChartsDatasetIdRoute = ChartsDatasetIdRouteImport.update({
-  id: '/$datasetId',
-  path: '/$datasetId',
-  getParentRoute: () => ChartsRoute,
+  id: '/charts/$datasetId',
+  path: '/charts/$datasetId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardDatasetIdRoute = DashboardDatasetIdRouteImport.update({
-  id: '/$datasetId',
-  path: '/$datasetId',
-  getParentRoute: () => DashboardRoute,
+  id: '/dashboard/$datasetId',
+  path: '/dashboard/$datasetId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DataOverviewDatasetIdRoute = DataOverviewDatasetIdRouteImport.update({
   id: '/data-overview/$datasetId',
@@ -42,9 +42,9 @@ const DataOverviewDatasetIdRoute = DataOverviewDatasetIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExportDatasetIdRoute = ExportDatasetIdRouteImport.update({
-  id: '/$datasetId',
-  path: '/$datasetId',
-  getParentRoute: () => ExportRoute,
+  id: '/export/$datasetId',
+  path: '/export/$datasetId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -102,7 +102,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   UploadRoute: typeof UploadRoute
+  ChartsDatasetIdRoute: typeof ChartsDatasetIdRoute
+  DashboardDatasetIdRoute: typeof DashboardDatasetIdRoute
   DataOverviewDatasetIdRoute: typeof DataOverviewDatasetIdRoute
+  ExportDatasetIdRoute: typeof ExportDatasetIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -123,17 +126,17 @@ declare module '@tanstack/react-router' {
     }
     '/charts/$datasetId': {
       id: '/charts/$datasetId'
-      path: '/$datasetId'
+      path: '/charts/$datasetId'
       fullPath: '/charts/$datasetId'
       preLoaderRoute: typeof ChartsDatasetIdRouteImport
-      parentRoute: typeof ChartsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/$datasetId': {
       id: '/dashboard/$datasetId'
-      path: '/$datasetId'
+      path: '/dashboard/$datasetId'
       fullPath: '/dashboard/$datasetId'
       preLoaderRoute: typeof DashboardDatasetIdRouteImport
-      parentRoute: typeof DashboardRoute
+      parentRoute: typeof rootRouteImport
     }
     '/data-overview/$datasetId': {
       id: '/data-overview/$datasetId'
@@ -144,10 +147,10 @@ declare module '@tanstack/react-router' {
     }
     '/export/$datasetId': {
       id: '/export/$datasetId'
-      path: '/$datasetId'
+      path: '/export/$datasetId'
       fullPath: '/export/$datasetId'
       preLoaderRoute: typeof ExportDatasetIdRouteImport
-      parentRoute: typeof ExportRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -155,7 +158,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   UploadRoute: UploadRoute,
+  ChartsDatasetIdRoute: ChartsDatasetIdRoute,
+  DashboardDatasetIdRoute: DashboardDatasetIdRoute,
   DataOverviewDatasetIdRoute: DataOverviewDatasetIdRoute,
+  ExportDatasetIdRoute: ExportDatasetIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
