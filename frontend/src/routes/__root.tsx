@@ -21,17 +21,38 @@ import { Toaster } from "@/components/ui/sonner";
 import { useTheme } from "@/lib/hooks/useTheme";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import useLocalStorage from "@/lib/hooks/useLocalStorage";
 
 export const Route = createRootRoute({
   component: RootLayout,
 });
 
 const navItems = [
-  { to: "/data-overview/$datasetId", label: "Data Overview", icon: Database },
-  { to: "/charts", label: "Charts", icon: BarChart3 },
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/upload", label: "Upload", icon: Upload },
-  { to: "/export", label: "Export", icon: Download },
+  {
+    to: "/data-overview/$datasetId",
+    label: "Data Overview",
+    icon: Database,
+    needDatasetId: true,
+  },
+  {
+    to: "/charts/$datasetId",
+    label: "Charts",
+    icon: BarChart3,
+    needDatasetId: false,
+  },
+  {
+    to: "/dashboard/$datasetId",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    needDatasetId: true,
+  },
+  { to: "/upload", label: "Upload", icon: Upload, needDatasetId: true },
+  {
+    to: "/export/$datasetId",
+    label: "Export",
+    icon: Download,
+    needDatasetId: true,
+  },
 ];
 
 const queryClient = new QueryClient();
@@ -40,6 +61,7 @@ const queryClient = new QueryClient();
 function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { theme, toggleTheme } = useTheme();
+  const [datasetId, setDatasetId] = useLocalStorage("datasetId", "");
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -61,23 +83,43 @@ function RootLayout() {
 
           {/* Nav */}
           <nav className="flex flex-1 flex-col gap-1 px-3 pt-2">
-            {navItems.map(({ to, label, icon: Icon }) => {
+            {navItems.map(({ to, label, icon: Icon, needDatasetId }) => {
               const active = pathname.startsWith(to);
-              return (
-                <Link
-                  key={to}
-                  to={to}
-                  className={[
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    active
-                      ? "bg-secondary-container text-on-secondary-container"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent",
-                  ].join(" ")}
-                >
-                  <Icon className="h-4.5 w-4.5 shrink-0" strokeWidth={2} />
-                  <span className="truncate">{label}</span>
-                </Link>
-              );
+
+              if (needDatasetId) {
+                return (
+                  <Link
+                    key={to}
+                    to={to}
+                    params={{ datasetId: datasetId }}
+                    className={[
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                      active
+                        ? "bg-secondary-container text-on-secondary-container"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent",
+                    ].join(" ")}
+                  >
+                    <Icon className="h-4.5 w-4.5 shrink-0" strokeWidth={2} />
+                    <span className="truncate">{label}</span>
+                  </Link>
+                );
+              } else {
+                return (
+                  <Link
+                    key={to}
+                    to={to}
+                    className={[
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                      active
+                        ? "bg-secondary-container text-on-secondary-container"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent",
+                    ].join(" ")}
+                  >
+                    <Icon className="h-4.5 w-4.5 shrink-0" strokeWidth={2} />
+                    <span className="truncate">{label}</span>
+                  </Link>
+                );
+              }
             })}
           </nav>
 

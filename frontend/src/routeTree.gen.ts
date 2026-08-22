@@ -8,161 +8,155 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as ChartsRouteImport } from "./routes/charts";
-import { Route as DashboardRouteImport } from "./routes/dashboard";
-import { Route as ExportRouteImport } from "./routes/export";
-import { Route as UploadRouteImport } from "./routes/upload";
-import { Route as DataOverviewDatasetIdRouteImport } from "./routes/data-overview/$datasetId";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as UploadRouteImport } from './routes/upload'
+import { Route as ChartsDatasetIdRouteImport } from './routes/charts/$datasetId'
+import { Route as DashboardDatasetIdRouteImport } from './routes/dashboard/$datasetId'
+import { Route as DataOverviewDatasetIdRouteImport } from './routes/data-overview/$datasetId'
+import { Route as ExportDatasetIdRouteImport } from './routes/export/$datasetId'
 
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
-const ChartsRoute = ChartsRouteImport.update({
-  id: "/charts",
-  path: "/charts",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const DashboardRoute = DashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const ExportRoute = ExportRouteImport.update({
-  id: "/export",
-  path: "/export",
-  getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const UploadRoute = UploadRouteImport.update({
-  id: "/upload",
-  path: "/upload",
+  id: '/upload',
+  path: '/upload',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const ChartsDatasetIdRoute = ChartsDatasetIdRouteImport.update({
+  id: '/$datasetId',
+  path: '/$datasetId',
+  getParentRoute: () => ChartsRoute,
+} as any)
+const DashboardDatasetIdRoute = DashboardDatasetIdRouteImport.update({
+  id: '/$datasetId',
+  path: '/$datasetId',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DataOverviewDatasetIdRoute = DataOverviewDatasetIdRouteImport.update({
-  id: "/data-overview/$datasetId",
-  path: "/data-overview/$datasetId",
+  id: '/data-overview/$datasetId',
+  path: '/data-overview/$datasetId',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const ExportDatasetIdRoute = ExportDatasetIdRouteImport.update({
+  id: '/$datasetId',
+  path: '/$datasetId',
+  getParentRoute: () => ExportRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/charts": typeof ChartsRoute;
-  "/dashboard": typeof DashboardRoute;
-  "/export": typeof ExportRoute;
-  "/upload": typeof UploadRoute;
-  "/data-overview/$datasetId": typeof DataOverviewDatasetIdRoute;
+  '/': typeof IndexRoute
+  '/upload': typeof UploadRoute
+  '/charts/$datasetId': typeof ChartsDatasetIdRoute
+  '/dashboard/$datasetId': typeof DashboardDatasetIdRoute
+  '/data-overview/$datasetId': typeof DataOverviewDatasetIdRoute
+  '/export/$datasetId': typeof ExportDatasetIdRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/charts": typeof ChartsRoute;
-  "/dashboard": typeof DashboardRoute;
-  "/export": typeof ExportRoute;
-  "/upload": typeof UploadRoute;
-  "/data-overview/$datasetId": typeof DataOverviewDatasetIdRoute;
+  '/': typeof IndexRoute
+  '/upload': typeof UploadRoute
+  '/charts/$datasetId': typeof ChartsDatasetIdRoute
+  '/dashboard/$datasetId': typeof DashboardDatasetIdRoute
+  '/data-overview/$datasetId': typeof DataOverviewDatasetIdRoute
+  '/export/$datasetId': typeof ExportDatasetIdRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/charts": typeof ChartsRoute;
-  "/dashboard": typeof DashboardRoute;
-  "/export": typeof ExportRoute;
-  "/upload": typeof UploadRoute;
-  "/data-overview/$datasetId": typeof DataOverviewDatasetIdRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/upload': typeof UploadRoute
+  '/charts/$datasetId': typeof ChartsDatasetIdRoute
+  '/dashboard/$datasetId': typeof DashboardDatasetIdRoute
+  '/data-overview/$datasetId': typeof DataOverviewDatasetIdRoute
+  '/export/$datasetId': typeof ExportDatasetIdRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/charts"
-    | "/dashboard"
-    | "/export"
-    | "/upload"
-    | "/data-overview/$datasetId";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/upload'
+    | '/charts/$datasetId'
+    | '/dashboard/$datasetId'
+    | '/data-overview/$datasetId'
+    | '/export/$datasetId'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/charts"
-    | "/dashboard"
-    | "/export"
-    | "/upload"
-    | "/data-overview/$datasetId";
+    | '/'
+    | '/upload'
+    | '/charts/$datasetId'
+    | '/dashboard/$datasetId'
+    | '/data-overview/$datasetId'
+    | '/export/$datasetId'
   id:
-    | "__root__"
-    | "/"
-    | "/charts"
-    | "/dashboard"
-    | "/export"
-    | "/upload"
-    | "/data-overview/$datasetId";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/upload'
+    | '/charts/$datasetId'
+    | '/dashboard/$datasetId'
+    | '/data-overview/$datasetId'
+    | '/export/$datasetId'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  ChartsRoute: typeof ChartsRoute;
-  DashboardRoute: typeof DashboardRoute;
-  ExportRoute: typeof ExportRoute;
-  UploadRoute: typeof UploadRoute;
-  DataOverviewDatasetIdRoute: typeof DataOverviewDatasetIdRoute;
+  IndexRoute: typeof IndexRoute
+  UploadRoute: typeof UploadRoute
+  DataOverviewDatasetIdRoute: typeof DataOverviewDatasetIdRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/charts": {
-      id: "/charts";
-      path: "/charts";
-      fullPath: "/charts";
-      preLoaderRoute: typeof ChartsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/dashboard": {
-      id: "/dashboard";
-      path: "/dashboard";
-      fullPath: "/dashboard";
-      preLoaderRoute: typeof DashboardRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/export": {
-      id: "/export";
-      path: "/export";
-      fullPath: "/export";
-      preLoaderRoute: typeof ExportRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/upload": {
-      id: "/upload";
-      path: "/upload";
-      fullPath: "/upload";
-      preLoaderRoute: typeof UploadRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/data-overview/$datasetId": {
-      id: "/data-overview/$datasetId";
-      path: "/data-overview/$datasetId";
-      fullPath: "/data-overview/$datasetId";
-      preLoaderRoute: typeof DataOverviewDatasetIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/charts/$datasetId': {
+      id: '/charts/$datasetId'
+      path: '/$datasetId'
+      fullPath: '/charts/$datasetId'
+      preLoaderRoute: typeof ChartsDatasetIdRouteImport
+      parentRoute: typeof ChartsRoute
+    }
+    '/dashboard/$datasetId': {
+      id: '/dashboard/$datasetId'
+      path: '/$datasetId'
+      fullPath: '/dashboard/$datasetId'
+      preLoaderRoute: typeof DashboardDatasetIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/data-overview/$datasetId': {
+      id: '/data-overview/$datasetId'
+      path: '/data-overview/$datasetId'
+      fullPath: '/data-overview/$datasetId'
+      preLoaderRoute: typeof DataOverviewDatasetIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/export/$datasetId': {
+      id: '/export/$datasetId'
+      path: '/$datasetId'
+      fullPath: '/export/$datasetId'
+      preLoaderRoute: typeof ExportDatasetIdRouteImport
+      parentRoute: typeof ExportRoute
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ChartsRoute: ChartsRoute,
-  DashboardRoute: DashboardRoute,
-  ExportRoute: ExportRoute,
   UploadRoute: UploadRoute,
   DataOverviewDatasetIdRoute: DataOverviewDatasetIdRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
