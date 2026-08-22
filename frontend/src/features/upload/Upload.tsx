@@ -15,6 +15,7 @@ import { formatSize, getExtension } from "@/lib/utils";
 import { toast } from "sonner";
 import fetchWrapper from "@/lib/fetchWrapper";
 import { useNavigate } from "@tanstack/react-router";
+import useLocalStorage from "@/lib/hooks/useLocalStorage";
 
 type FileStatus = "waiting" | "uploading" | "complete" | "error";
 
@@ -36,6 +37,8 @@ export default function Upload() {
   const [file, setFile] = useState<UploadFile | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [datasetId, setDatasetId] = useLocalStorage("datasetId", "");
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   // file info (will only be used when file is present)
@@ -123,6 +126,8 @@ export default function Upload() {
       }>("dataset/upload", { body: formData });
 
       toast.success("file uploaded successfully.");
+
+      setDatasetId(result.redis_key);
 
       navigate({
         to: "/data-overview/$datasetId",
