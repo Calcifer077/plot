@@ -37,7 +37,10 @@ export default function Upload() {
   const [file, setFile] = useState<UploadFile | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [datasetId, setDatasetId] = useLocalStorage("datasetId", "");
+  const [datasetId, setDatasetId] = useLocalStorage(
+    "datasetId",
+    "no-dataset-id",
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
 

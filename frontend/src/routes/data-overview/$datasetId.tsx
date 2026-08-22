@@ -23,7 +23,8 @@ export const Route = createFileRoute("/data-overview/$datasetId")({
   validateSearch: (search) => dataOverviewSearchSchema.parse(search),
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: async ({ params, deps }) => {
-    if (params.datasetId === undefined) throw notFound();
+    if (params.datasetId === undefined || params.datasetId === "no-dataset-id")
+      throw notFound();
 
     const doesDataSetExists = await fetchWrapper(
       `dataset/check-if-dataset-exists/${params.datasetId}`,
