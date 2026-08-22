@@ -2,7 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { z } from "zod";
 
 import DataOverview from "@/features/data_overview/DataOverview";
-import { EmptyDemo } from "@/components/app/ui/EmptyState";
+import EmptyState from "@/components/app/data_overview/EmptyState";
 import fetchWrapper from "@/lib/fetchWrapper";
 
 type DataOverViewValuesRow = Record<string, string | number | boolean | null>;
@@ -40,6 +40,6 @@ export const Route = createFileRoute("/data-overview/$datasetId")({
 
     return { values };
   },
-  notFoundComponent: EmptyDemo,
+  notFoundComponent: EmptyState,
   component: DataOverview,
 });
